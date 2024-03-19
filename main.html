@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Image Encryption and Decryption Wave App</title>
+    <!-- Import the CryptoJS library from CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+</head>
+<body>
+    <h1>Image Encryption and Decryption Wave App</h1>
+    <p>Select an image file to encrypt or decrypt:</p>
+    <input type="file" id="imageFile" accept="image/*">
+    <p>Enter your secret key:</p>
+    <input type="password" id="keyInput">
+    <p>Select your encryption or decryption method:</p>
+    <select id="methodSelect">
+        <option value="AES">AES</option>
+        <option value="DES">DES</option>
+        <option value="TripleDES">TripleDES</option>
+        <option value="Rabbit">Rabbit</option>
+        <option value="RC4">RC4</option>
+    </select>
+    <p>Click the button to encrypt or decrypt:</p>
+    <button type="button" id="encryptButton">Encrypt</button>
+    <button type="button" id="decryptButton">Decrypt</button>
+    <p>Your encrypted or decrypted image:</p>
+    <canvas id="imageCanvas"></canvas>
+    <script>
+        // Define a function to encrypt an image with a secret key and a method
+        const encryptImage = (image, key, method) => {
+            // Convert the image to a base64 string
+            const reader = new FileReader();
+            reader.readAsDataURL(image);
+            reader.onload = () => {
+                // Get the base64 data
+                const data = reader.result;
+                // Encrypt the data with the secret key and the method
+                const encryptedData = CryptoJS[method].encrypt(data, key).toString();
+                // Draw the encrypted data as an image on the canvas
+                const canvas = document.getElementById("imageCanvas");
+                const ctx = canvas.getContext("2d");
+                const img = new Image();
+                img.src = encryptedData;
+                img.onload = () => {
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    ctx.drawImage(img, 0, 0);
+                };
+            };
+        };
+
+        // Define a function to decrypt an image with a secret key and a method
+        const decryptImage = (image, key, method) => {
+            // Convert the image to a base64 string
+            const reader = new FileReader();
+            reader.readAsDataURL(image);
+            reader.onload = () => {
+                // Get the base64 data
+                const data = reader.result;
+                // Decrypt the data with the secret key and the method
+                const decryptedData = CryptoJS[method].decrypt(data, key);
+                // Convert the decrypted data to a UTF-8 string
+                const utf8Data = decryptedData.toString(CryptoJS.enc.Utf8);
+                // Draw the decrypted data as an image on the canvas
+                const canvas = document.getElementById("imageCanvas");
+                const ctx = canvas.getContext("2d");
+                const img = new Image();
+                img.src = utf8Data;
+                img.onload = () => {
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    ctx.drawImage(img, 0, 0);
+                };
+            };
+        };
+
+        // Define a function to handle the encryption button click
+        const handleEncrypt = () => {
+            // Get the image file from the input
+            const imageFile = document.getElementById("imageFile").files[0];
+            // Get the secret key from the input
+            const keyInput = document.getElementById("keyInput").value;
+            // Get the selected method from the select
+            const methodSelect = document.getElementById("methodSelect").value;
+            // Encrypt the image with the secret key and the method
+            encryptImage(imageFile, keyInput, methodSelect);
+        };
+
+        // Define a function to handle the decryption button click
+        const handleDecrypt = () => {
+            // Get the image file from the input
+            const imageFile = document.getElementById("imageFile").files[0];
+            // Get the secret key from the input
+            const keyInput = document.getElementById("keyInput").value;
+            // Get the selected method from the select
+            const methodSelect = document.getElementById("methodSelect").value;
+            // Decrypt the image with the secret key and the method
+            decryptImage(imageFile, keyInput, methodSelect);
+        };
+
+        // Add event listeners to the buttons
+        document.getElementById("encryptButton").addEventListener("click", handleEncrypt);
+        document.getElementById("decryptButton").addEventListener("click", handleDecrypt);
+    </script>
+</body>
+</html>
